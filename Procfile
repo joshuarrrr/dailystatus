@@ -1,1 +1,1 @@
-web: gunicorn app:dailystatus
+web: gunicorn app: dailystatus.py
