@@ -69,9 +69,11 @@ def post_install():
 def postUpdate(tag, channel='#general', **kwargs):
     with open("token.txt", 'r') as f:
         user_token = f.read()
+        print(user_token)
+        sc = SlackClient(os.environ['SLACK_USER_TOKEN'])
 
     # sc = SlackClient(os.environ['SLACK_USER_TOKEN']
-    sc = SlackClient(user_token)
+    # sc = SlackClient(user_token)
     return sc.api_call(
         'chat.postMessage',
         as_user='false',
