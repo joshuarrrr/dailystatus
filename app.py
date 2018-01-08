@@ -16,6 +16,7 @@ app = Flask(__name__)
 
 slack = Slack(app)
 slack_token = os.environ['SLACK_BOT_TOKEN']
+slack_user_token = ''
 # sc = SlackClient(os.environ['SLACK_BOT_OAUTH_TOKEN'])
 
 
@@ -56,6 +57,8 @@ def post_install():
     with open("token.txt", 'w') as f:
         f.write(auth_response['access_token'])
 
+    slack_user_token = auth_response['access_token']
+
     # os.environ['SLACK_USER_TOKEN'] = auth_response['access_token']
     # os.environ['SLACK_BOT_TOKEN'] = auth_response['bot']['bot_access_token']
 
@@ -67,13 +70,13 @@ def post_install():
 
 
 def postUpdate(tag, channel='#general', **kwargs):
-    with open("token.txt", 'r') as f:
-        user_token = f.read()
-        print(user_token)
-        sc = SlackClient(os.environ['SLACK_USER_TOKEN'])
+    # with open("token.txt", 'r') as f:
+    #     user_token = f.read()
+    #     print(user_token)
+    #     sc = SlackClient(user_token)
 
     # sc = SlackClient(os.environ['SLACK_USER_TOKEN']
-    # sc = SlackClient(user_token)
+    sc = SlackClient(slack_user_token)
     return sc.api_call(
         'chat.postMessage',
         as_user='false',
@@ -102,11 +105,11 @@ def standup(**kwargs):
         response = update
         # response = os.environ['SLACK_USER_TOKEN']
         # response = ':frowning: Sorry, something went wrong trying to post your standup'
-    # return slack.response(response)
+    return slack.response(response)
     # sc = SlackClient(os.environ['SLACK_USER_TOKEN'])
-    return sc.api_call(
-        'users.identity'
-    )
+    # return sc.api_call(
+    #     'users.identity'
+    # )
 
 
 @slack.command('sitdown', token=slack_token,
