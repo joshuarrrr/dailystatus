@@ -36,7 +36,7 @@ def post_install():
 
     # Retrieve the auth code from the request params
     auth_code = request.args['code']
-    print(auth_code)
+    # print(auth_code)
 
     # An empty string is a valid token for this request
     sc = SlackClient('')
@@ -49,21 +49,29 @@ def post_install():
         code=auth_code
     )
 
-    print(auth_response)
+    # print(auth_response)
 
     # Save the bot token to an environmental variable or to your data store
     # for later use
-    os.environ['SLACK_USER_TOKEN'] = auth_response['access_token']
+    with open("token.txt", 'w') as f:
+        f.write(auth_response['access_token'])
+
+    # os.environ['SLACK_USER_TOKEN'] = auth_response['access_token']
     # os.environ['SLACK_BOT_TOKEN'] = auth_response['bot']['bot_access_token']
 
-    sc = SlackClient(os.environ['SLACK_USER_TOKEN'])
+    # sc = SlackClient(os.environ['SLACK_USER_TOKEN'])
+    sc = SlackClient(auth_response['access_token'])
 
     # Don't forget to let the user know that auth has succeeded!
     return 'Auth complete!'
 
 
 def postUpdate(tag, channel='#general', **kwargs):
-    sc = SlackClient(os.environ['SLACK_USER_TOKEN'])
+    with open("token.txt", 'w') as f:
+        user_token = f.read()
+
+    # sc = SlackClient(os.environ['SLACK_USER_TOKEN']
+    sc = SlackClient(user_token)
     return sc.api_call(
         'chat.postMessage',
         as_user='false',
@@ -93,7 +101,7 @@ def standup(**kwargs):
         # response = os.environ['SLACK_USER_TOKEN']
         # response = ':frowning: Sorry, something went wrong trying to post your standup'
     # return slack.response(response)
-    sc = SlackClient(os.environ['SLACK_USER_TOKEN'])
+    # sc = SlackClient(os.environ['SLACK_USER_TOKEN'])
     return sc.api_call(
         'users.identity'
     )
