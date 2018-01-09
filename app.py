@@ -10,7 +10,8 @@ client_id = os.environ['SLACK_CLIENT_ID']
 client_secret = os.environ['SLACK_CLIENT_SECRET']
 oauth_scope = os.environ['SLACK_BOT_SCOPE']
 state = ''
-redirect_uri = 'https://dailystatus.herokuapp.com/finish_auth'
+# redirect_uri = 'https://dailystatus.herokuapp.com/finish_auth'
+redirect_uri = 'https://6a8ad775.ngrok.io/finish_auth'
 
 app = Flask(__name__)
 
@@ -76,7 +77,8 @@ def postUpdate(tag, channel='#general', **kwargs):
     #     sc = SlackClient(user_token)
 
     # sc = SlackClient(os.environ['SLACK_USER_TOKEN']
-    sc = SlackClient(slack_user_token)
+    # sc = SlackClient(slack_user_token)
+    sc = SlackClient(os.environ['SLACK_BOT_OAUTH_TOKEN'])
     return sc.api_call(
         'chat.postMessage',
         as_user='false',
