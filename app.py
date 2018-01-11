@@ -79,10 +79,16 @@ def get_username(user_id, sc):
         'users.info',
         user=user_id
     )
+
+    user = {
+        'name': result['user']['profile']['real_name'],
+        'icon': result['user']['profile']['image_48']
+    }
+
     if result['user']['profile']['display_name']:
-        return result['user']['profile']['display_name']
-    else:
-        return result['user']['profile']['real_name']
+        user['name'] = result['user']['profile']['display_name']
+
+    return user
 
 
 def post_update(tag, channel='#general', attachments='', **kwargs):
@@ -94,10 +100,12 @@ def post_update(tag, channel='#general', attachments='', **kwargs):
     # sc = SlackClient(os.environ['SLACK_USER_TOKEN']
     # sc = SlackClient(slack_user_token)
     sc = SlackClient(os.environ['SLACK_BOT_OAUTH_TOKEN'])
+    user = get_username(kwargs.get('user_id'), sc)
     return sc.api_call(
         'chat.postMessage',
         as_user='false',
-        username=get_username(kwargs.get('user_id'), sc),
+        username=user['name'],
+        icon_url=user['icon'],
         channel=channel,
         link_names='true',
         text='*%s:* %s' % (tag, kwargs.get('text')),
@@ -122,7 +130,7 @@ def get_status(**kwargs):
         if result['ok']:
             for message in list(result['messages']):
                 # print(message)
-                if 'username' in dict(message) and dict(message)['username'] == get_username(kwargs.get('user_id'), sc):
+                if 'username' in dict(message) and dict(message)['username'] == get_username(kwargs.get('user_id'), sc)['name']:
                     return message
                 latest = dict(message)['ts']
             # return slack.response(result['messages'][3]['text'])
