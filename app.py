@@ -133,11 +133,12 @@ def goodbye(**kwargs):
 @slack.command('standup', token=slack_token,
                team_id=team_id, methods=['POST'])
 def standup(**kwargs):
+    tag = ':arrow_double_up: Standup'
     last_status = get_status(**kwargs)
-    if kwargs.get('text') == last_status['text']:
+    if '*%s:* %s' % (tag, kwargs.get('text')) == last_status['text']:
         return slack.response('That status is already posted')
 
-    update = dict(post_update(':arrow_double_up: Standup', updates_channel, **kwargs))
+    update = dict(post_update(tag, updates_channel, **kwargs))
 
     if update['ok']:
         response = 'Successfully posted your message to <#%s>.' % update['channel']
@@ -159,7 +160,7 @@ def sitdown(**kwargs):
     if ':arrow_double_up: Standup' in last_status['text']:
         attachments = [{'text': last_status['text']}]
 
-    update = dict(post_update(':arrow_double_down: Sitdown', updates_channel, attachments, kwargs))
+    update = dict(post_update(':arrow_double_down: Sitdown', updates_channel, attachments, **kwargs))
     if update['ok']:
         response = 'Successfully posted your message to <#%s>.' % update['channel']
     else:
