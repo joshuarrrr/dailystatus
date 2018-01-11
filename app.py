@@ -1,5 +1,8 @@
 import random
 import string
+import time
+from datetime import datetime, timedelta
+from dateutil.relativedelta import relativedelta
 
 from flask import Flask, request
 from flask_slack import Slack
@@ -12,6 +15,8 @@ oauth_scope = os.environ['SLACK_BOT_SCOPE']
 state = ''
 # redirect_uri = 'https://dailystatus.herokuapp.com/finish_auth'
 redirect_uri = 'https://6a8ad775.ngrok.io/finish_auth'
+team_id = 'T86UNPR0V'
+updates_channel = 'C89EMFXUN'
 
 app = Flask(__name__)
 
@@ -55,8 +60,6 @@ def post_install():
 
     # Save the bot token to an environmental variable or to your data store
     # for later use
-    with open("token.txt", 'w') as f:
-        f.write(auth_response['access_token'])
 
     slack_user_token = auth_response['access_token']
 
@@ -70,7 +73,7 @@ def post_install():
     return 'Auth complete!'
 
 
-def postUpdate(tag, channel='#general', **kwargs):
+def post_update(tag, channel='#general', attachments='', **kwargs):
     # with open("token.txt", 'r') as f:
     #     user_token = f.read()
     #     print(user_token)
@@ -85,26 +88,61 @@ def postUpdate(tag, channel='#general', **kwargs):
         username=kwargs.get('user_name'),
         channel=channel,
         link_names='true',
-        text='*%s:* %s' % (tag, kwargs.get('text'))
+        text='*%s:* %s' % (tag, kwargs.get('text')),
+        attachments=attachments
     )
 
 
+@slack.command('get status', token=slack_token,
+               team_id=team_id, methods=['POST'])
+def get_status(**kwargs):
+    sc = SlackClient(os.environ['SLACK_BOT_OAUTH_TOKEN'])
+    latest = datetime.now().timestamp()
+    while True:
+        result = sc.api_call(
+            'channels.history',
+            channel=updates_channel,
+            oldest=(datetime.now() - timedelta(days=14)).timestamp(),
+            latest=latest
+            # count=1
+        )
+        result = dict(result)
+        if result['ok']:
+            for message in list(result['messages']):
+                # print(message)
+                if 'username' in dict(message) and dict(message)['username'] == kwargs.get('user_name'):
+                    return message
+                latest = dict(message)['ts']
+            # return slack.response(result['messages'][3]['text'])
+            # return result['messages']
+        else:
+            return result['error']
+        if not result['has_more']:
+            return None
+
+
+
 @slack.command('goodbye', token=slack_token,
-               team_id='T86UNPR0V', methods=['POST'])
+               team_id=team_id, methods=['POST'])
 def goodbye(**kwargs):
-    update = dict(postUpdate('goodbye', **kwargs))
+    update = dict(post_update('goodbye', **kwargs))
     response = 'Successfully posted your message to <#%s>.' % update['channel']
     return slack.response(response)
 
 
 @slack.command('standup', token=slack_token,
-               team_id='T86UNPR0V', methods=['POST'])
+               team_id=team_id, methods=['POST'])
 def standup(**kwargs):
-    update = dict(postUpdate(':arrow_double_up: Standup', '#standups', **kwargs))
+    last_stataus = get_status(kwargs)
+    if kwargs.get('text') == last_status['text']:
+        return slack.response('That status is already posted')
+
+    update = dict(post_update(':arrow_double_up: Standup', updates_channel, **kwargs))
+
     if update['ok']:
         response = 'Successfully posted your message to <#%s>.' % update['channel']
     else:
-        response = update
+        response = update['error']
         # response = os.environ['SLACK_USER_TOKEN']
         # response = ':frowning: Sorry, something went wrong trying to post your standup'
     return slack.response(response)
@@ -115,9 +153,13 @@ def standup(**kwargs):
 
 
 @slack.command('sitdown', token=slack_token,
-               team_id='T86UNPR0V', methods=['POST'])
+               team_id=team_id, methods=['POST'])
 def sitdown(**kwargs):
-    update = dict(postUpdate(':arrow_double_down: Sitdown', '#standups', **kwargs))
+    last_stataus = get_status(kwargs)
+    if ':arrow_double_up: Standup' in last_status['text']:
+        attachments = [{'text': last_status['text']}]
+
+    update = dict(post_update(':arrow_double_down: Sitdown', updates_channel, attachments, kwargs))
     if update['ok']:
         response = 'Successfully posted your message to <#%s>.' % update['channel']
     else:
@@ -136,3 +178,4 @@ app.add_url_rule('/sitdown', view_func=slack.dispatch)
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port, debug=True)
+    # print(get_status(user_name='joshuarrrr'))
