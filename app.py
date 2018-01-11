@@ -1,6 +1,7 @@
 import random
 import string
 import time
+import json
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
 
@@ -73,6 +74,17 @@ def post_install():
     return 'Auth complete!'
 
 
+def get_username(user_id, sc):
+    result = sc.api_call(
+        'users.info',
+        user=user_id
+    )
+    if result['user']['profile']['display_name']:
+        return result['user']['profile']['display_name']
+    else:
+        return result['user']['profile']['real_name']
+
+
 def post_update(tag, channel='#general', attachments='', **kwargs):
     # with open("token.txt", 'r') as f:
     #     user_token = f.read()
@@ -85,7 +97,7 @@ def post_update(tag, channel='#general', attachments='', **kwargs):
     return sc.api_call(
         'chat.postMessage',
         as_user='false',
-        username=kwargs.get('user_name'),
+        username=get_username(kwargs.get('user_name'), sc),
         channel=channel,
         link_names='true',
         text='*%s:* %s' % (tag, kwargs.get('text')),
@@ -185,6 +197,8 @@ app.add_url_rule('/sitdown', view_func=slack.dispatch)
 #     return 'Hello Slack!'
 
 if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 5000))
-    app.run(host='0.0.0.0', port=port, debug=True)
+    # port = int(os.environ.get('PORT', 5000))
+    # app.run(host='0.0.0.0', port=port, debug=True)
     # print(get_status(user_name='joshuarrrr'))
+    print(get_username('U89D1FH1A'))
+    print(get_username('U86QEU8GJ'))
