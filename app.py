@@ -157,13 +157,18 @@ def standup(**kwargs):
                team_id=team_id, methods=['POST'])
 def sitdown(**kwargs):
     last_status = get_status(**kwargs)
+    attachments = ''
+    tag = ':arrow_double_down: Sitdown'
+
     if ':arrow_double_up: Standup' in last_status['text']:
         attachments = [{
             'text': last_status['text'],
             'mrkdwn_in': ['text']
         }]
+    else:
+        tag = ':arrow_double_up: Standup ' + tag
 
-    update = dict(post_update(':arrow_double_down: Sitdown', updates_channel, attachments, **kwargs))
+    update = dict(post_update(, updates_channel, attachments, **kwargs))
     if update['ok']:
         response = 'Successfully posted your message to <#%s>.' % update['channel']
     else:
