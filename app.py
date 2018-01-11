@@ -97,7 +97,7 @@ def post_update(tag, channel='#general', attachments='', **kwargs):
     return sc.api_call(
         'chat.postMessage',
         as_user='false',
-        username=get_username(kwargs.get('user_name'), sc),
+        username=get_username(kwargs.get('user_id'), sc),
         channel=channel,
         link_names='true',
         text='*%s:* %s' % (tag, kwargs.get('text')),
