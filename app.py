@@ -158,7 +158,7 @@ def goodbye(**kwargs):
 def standup(**kwargs):
     tag = ':arrow_double_up: Standup'
     last_status = get_status(**kwargs)
-    if '*%s:* %s' % (tag, kwargs.get('text')) == last_status['text']:
+    if last_status and '*%s:* %s' % (tag, kwargs.get('text')) == last_status['text']:
         return slack.response('That status is already posted')
 
     update = dict(post_update(tag, updates_channel, **kwargs))
@@ -183,7 +183,7 @@ def sitdown(**kwargs):
     attachments = ''
     tag = ':arrow_double_down: Sitdown'
 
-    if ':arrow_double_up: Standup' in last_status['text']:
+    if last_status and ':arrow_double_up: Standup' in last_status['text']:
         attachments = [{
             'text': last_status['text'],
             'mrkdwn_in': ['text']
