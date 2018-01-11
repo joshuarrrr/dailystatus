@@ -168,7 +168,7 @@ def sitdown(**kwargs):
     else:
         tag = ':arrow_double_up: Standup ' + tag
 
-    update = dict(post_update(, updates_channel, attachments, **kwargs))
+    update = dict(post_update(tag, updates_channel, attachments, **kwargs))
     if update['ok']:
         response = 'Successfully posted your message to <#%s>.' % update['channel']
     else:
