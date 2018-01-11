@@ -158,7 +158,10 @@ def standup(**kwargs):
 def sitdown(**kwargs):
     last_status = get_status(**kwargs)
     if ':arrow_double_up: Standup' in last_status['text']:
-        attachments = [{'text': last_status['text']}]
+        attachments = [{
+            'text': last_status['text'],
+            'mrkdwn_in': ['text']
+        }]
 
     update = dict(post_update(':arrow_double_down: Sitdown', updates_channel, attachments, **kwargs))
     if update['ok']:
