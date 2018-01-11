@@ -133,7 +133,7 @@ def goodbye(**kwargs):
 @slack.command('standup', token=slack_token,
                team_id=team_id, methods=['POST'])
 def standup(**kwargs):
-    last_stataus = get_status(**kwargs)
+    last_status = get_status(**kwargs)
     if kwargs.get('text') == last_status['text']:
         return slack.response('That status is already posted')
 
@@ -155,7 +155,7 @@ def standup(**kwargs):
 @slack.command('sitdown', token=slack_token,
                team_id=team_id, methods=['POST'])
 def sitdown(**kwargs):
-    last_stataus = get_status(**kwargs)
+    last_status = get_status(**kwargs)
     if ':arrow_double_up: Standup' in last_status['text']:
         attachments = [{'text': last_status['text']}]
 
