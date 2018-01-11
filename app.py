@@ -122,7 +122,7 @@ def get_status(**kwargs):
         if result['ok']:
             for message in list(result['messages']):
                 # print(message)
-                if 'username' in dict(message) and dict(message)['username'] == kwargs.get('user_name'):
+                if 'username' in dict(message) and dict(message)['username'] == get_username(kwargs.get('user_id'), sc):
                     return message
                 latest = dict(message)['ts']
             # return slack.response(result['messages'][3]['text'])
