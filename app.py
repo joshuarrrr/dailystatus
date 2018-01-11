@@ -14,16 +14,19 @@ client_id = os.environ['SLACK_CLIENT_ID']
 client_secret = os.environ['SLACK_CLIENT_SECRET']
 oauth_scope = os.environ['SLACK_BOT_SCOPE']
 state = ''
-# redirect_uri = 'https://dailystatus.herokuapp.com/finish_auth'
-redirect_uri = 'https://6a8ad775.ngrok.io/finish_auth'
-team_id = 'T86UNPR0V'
-updates_channel = 'C89EMFXUN'
+redirect_uri = 'https://dailystatus.herokuapp.com/finish_auth'
+# redirect_uri = 'https://6a8ad775.ngrok.io/finish_auth'
+# team_id = 'T86UNPR0V'
+# updates_channel = 'C89EMFXUN'
+
+team_id = 'T0DA8RT71'
+updates_channel = 'C89DCTLLA'
 
 app = Flask(__name__)
 
 slack = Slack(app)
 slack_token = os.environ['SLACK_BOT_TOKEN']
-slack_user_token = ''
+# slack_user_token = ''
 # sc = SlackClient(os.environ['SLACK_BOT_OAUTH_TOKEN'])
 
 
