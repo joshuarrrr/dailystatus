@@ -197,8 +197,8 @@ app.add_url_rule('/sitdown', view_func=slack.dispatch)
 #     return 'Hello Slack!'
 
 if __name__ == '__main__':
-    # port = int(os.environ.get('PORT', 5000))
-    # app.run(host='0.0.0.0', port=port, debug=True)
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port, debug=True)
     # print(get_status(user_name='joshuarrrr'))
-    print(get_username('U89D1FH1A'))
-    print(get_username('U86QEU8GJ'))
+    # print(get_username('U89D1FH1A'))
+    # print(get_username('U86QEU8GJ'))
